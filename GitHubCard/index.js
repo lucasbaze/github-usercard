@@ -24,14 +24,6 @@
           user, and adding that card to the DOM.
 */
 
-const followersArray = [
-    'tetondan',
-    'dustinmyers',
-    'justsml',
-    'luishrd',
-    'bigknell',
-];
-
 /* Step 3: Create a function that accepts a single object as its only argument,
           Using DOM methods and properties, create a component that will return the following DOM element:
 
@@ -51,6 +43,14 @@ const followersArray = [
 </div>
 
 */
+
+const followersArray = [
+    'tetondan',
+    'dustinmyers',
+    'justsml',
+    'luishrd',
+    'bigknell',
+];
 
 let cards = document.querySelector('.cards');
 
@@ -114,6 +114,10 @@ function createUserCard(userData) {
     let bio = document.createElement('p');
     bio.textContent = userData.bio;
 
+    //calendar container
+    let calendar = document.createElement('div');
+    calendar.setAttribute('style', 'margin-top: 20px');
+
     //append stuff
     cardInfo.append(
         name,
@@ -122,50 +126,47 @@ function createUserCard(userData) {
         profile,
         followers,
         following,
-        bio
+        bio,
+        calendar
     );
     cardContainer.append(img, cardInfo);
+
+    new GitHubCalendar(calendar, userData.login);
 
     return cardContainer;
 }
 
-//gitUser('lucasbaze');
+// gitUser('lucasbaze');
 // followersArray.forEach(user => {
 //     gitUser(user);
 // });
 
-/* List of LS Instructors Github username's:
-  tetondan
-  dustinmyers
-  justsml
-  luishrd
-  bigknell
-*/
+//
+// Recursion Testing
+//
 
 function recursive(userName) {
     //get the user data
-
     axios.get('https://api.github.com/users/' + userName).then(response => {
+        //create their card
         gitUser(userName);
+
+        //get the users followers
         let followers = response.data.followers;
+
+        //keep going
         if (followers < 5) {
             axios
                 .get('https://api.github.com/users/' + userName + '/followers')
                 .then(response => {
                     response.data.forEach(follower => {
-                        recursive(follower.login);
+                        gitUser(follower.login);
                     });
                 });
         } else {
             console.log(response.data.login);
         }
     });
-
-    //check to see if the person has any followers.
-    //if yes, go get their list of followers with the followers_url
-    //get the login info off of that returned response
-    //repeat the above steps
-    //if NO, then create the card and return it
 }
 
 recursive('lucasbaze');
